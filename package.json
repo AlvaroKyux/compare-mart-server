@@ -1,0 +1,27 @@
+{
+  "name": "compare-mart-server",
+  "version": "1.0.0",
+  "description": "Servidor (API REST) de Compare-Mart — favoritos, historial de comparaciones y reportes, respaldado por PostgreSQL (base de datos relacional).",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "migrate": "node src/db/migrate.js",
+    "seed": "node src/db/seed.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

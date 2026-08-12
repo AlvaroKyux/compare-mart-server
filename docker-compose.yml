@@ -1,0 +1,21 @@
+version: "3.8"
+
+# Levanta solo la base de datos — el servidor Node se sigue corriendo con
+# "npm run dev" fuera de Docker para que el hot-reload de nodemon funcione
+# normal. Uso: docker compose up -d
+services:
+  postgres:
+    image: postgres:16
+    container_name: compare_mart_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: compare_mart_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - compare_mart_pgdata:/var/lib/postgresql/data
+
+volumes:
+  compare_mart_pgdata:
