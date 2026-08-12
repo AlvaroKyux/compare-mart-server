@@ -10,8 +10,22 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
+// Las bases de datos gestionadas (Render, Railway, y la mayoría de
+// proveedores en la nube) exigen SSL en las conexiones externas — a
+// diferencia de Postgres local/Docker, que no lo necesita ni lo soporta
+// por defecto. Se activa automáticamente cuando `DATABASE_URL` apunta a
+// un host que no es localhost, así que no requiere una variable de
+// entorno nueva ni tocar nada al desplegar en una plataforma distinta.
+const isRemoteConnection =
+  Boolean(process.env.DATABASE_URL) &&
+  !process.env.DATABASE_URL.includes('localhost') &&
+  !process.env.DATABASE_URL.includes('127.0.0.1');
+
 const connectionConfig = process.env.DATABASE_URL
-  ? { connectionString: process.env.DATABASE_URL }
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: isRemoteConnection ? { rejectUnauthorized: false } : false,
+    }
   : {
       host: process.env.PGHOST || 'localhost',
       port: Number(process.env.PGPORT) || 5432,
