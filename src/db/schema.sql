@@ -47,3 +47,32 @@ CREATE TABLE IF NOT EXISTS comparaciones_historial (
 CREATE INDEX IF NOT EXISTS idx_favoritos_usuario       ON favoritos(usuario_id);
 CREATE INDEX IF NOT EXISTS idx_historial_usuario        ON comparaciones_historial(usuario_id);
 CREATE INDEX IF NOT EXISTS idx_historial_fecha          ON comparaciones_historial(fecha DESC);
+
+-- ============================================================================
+-- Sucursales físicas — soporte para el feature de sensor de ubicación.
+-- ============================================================================
+-- Solo se cargan cadenas para las que existen coordenadas reales verificadas
+-- (ver src/db/seedSucursales.js). Deliberadamente NO se incluyen las 10
+-- cadenas del catálogo: HEB, Costco, La Comer y Fresko no tienen presencia
+-- en la zona de prueba (Pachuca de Soto, Hgo.) y no se fuerzan datos falsos.
+-- Esas 4 cadenas siguen disponibles en Search/Compare por precio, mostrando
+-- "sin sucursal cercana registrada" cuando no hay coincidencia en esta tabla.
+CREATE TABLE IF NOT EXISTS sucursales (
+    id              SERIAL PRIMARY KEY,
+    cadena          VARCHAR(50) NOT NULL,
+    nombre_sucursal VARCHAR(150) NOT NULL,
+    direccion       VARCHAR(250) NOT NULL,
+    latitud         NUMERIC(10, 7) NOT NULL,
+    longitud        NUMERIC(10, 7) NOT NULL,
+    fecha_registro  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Índice por cadena: soporta el filtro opcional "solo sucursales de estas
+-- cadenas" en /api/sucursales/cercanas (ej. cuando el producto escaneado
+-- solo está disponible en 3 de las 6 cadenas geolocalizadas).
+CREATE INDEX IF NOT EXISTS idx_sucursales_cadena ON sucursales(cadena);
+
+-- Índice compuesto lat/lng: no reemplaza una extensión geoespacial (PostGIS),
+-- pero acelera el filtro previo al cálculo de distancia Haversine cuando la
+-- tabla crezca más allá de un puñado de sucursales de prueba.
+CREATE INDEX IF NOT EXISTS idx_sucursales_coordenadas ON sucursales(latitud, longitud);

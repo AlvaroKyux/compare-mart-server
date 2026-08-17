@@ -9,6 +9,7 @@
     "dev": "nodemon src/index.js",
     "migrate": "node src/db/migrate.js",
     "seed": "node src/db/seed.js",
+    "seed:sucursales": "node src/db/seedSucursales.js",
     "test": "node --test"
   },
   "dependencies": {
